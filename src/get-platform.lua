@@ -4,6 +4,7 @@ local function get_platform()
 
   if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
     return 'windows'
+  -- TURNS OUT this doesn't actually work
   elseif mp.get_property_native('options/input-app-events', o) ~= o then
     return 'macos'
   else

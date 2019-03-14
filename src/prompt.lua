@@ -27,7 +27,6 @@ local function prompt_linux(default_msg)
 end
 
 
--- FIXME neither getting the text nor cancelling works. Thanks Applel
 local function prompt_macos(default_msg)
   return system(
     [[osascript ]] ..
@@ -38,7 +37,7 @@ local function prompt_macos(default_msg)
         [[default answer "]] .. default_msg .. [["]] ..
       [[)' ]] ..
       [[-e 'if button returned of tweet is "Cancel" then return -128' ]] ..
-      [[-e 'return text return of tweet']]
+      [[-e 'return text returned of tweet' ]]
   )
 end
 
