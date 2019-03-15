@@ -1,4 +1,8 @@
 local prompt = require('prompt').prompt
+local anilist = require('anilist')
+local get_show_name = require('get-show-name').get_show_name
+
+local utils = require('mp.utils')
 
 local OS = require('get-platform').get_platform()
 local TWITTER_FILE_LIMIT = 4
@@ -10,11 +14,11 @@ local function message(msg)
 end
 
 local function get_filename()
-  mp.get_property('filename')
+  return mp.get_property('filename')
 end
 
 local function get_extension()
-  mp.get_property('file-format')
+  return mp.get_property('file-format')
 end
 
 
@@ -61,32 +65,32 @@ end
 -- dumb idea 1: port https://github.com/twitter/twitter-text to correctly count the characters
 -- dumb idea 2: write the tweet directly from mpv
 
---
--- AniList
---
+local function do_stuff()
+  local show_name = get_show_name(get_filename(), get_extension())
+  local hashtag
 
-local anilist_token = nil
+  if show_name ~= prev.show_name then
+    local ok, h = anilist.search_hashtag(show_name, {
+      encode = utils.format_json,
+      decode = utils.parse_json
+    })
 
-local function get_anilist_token()
-  local response = https.request {
-    url = 'https://anilist.co/api/v2/oauth/authorize?' .. params,
-    method = 'POST',
-    source = function()
-      return utils.format_json {
-        grant_type = 'authorization_code',
-        client_id = anilist.client_id,
-        client_secret = anilist.client_secret,
-        code = anilist.code
-      }
-    end
-    -- sink = ltn12.sink.table response
-  }
+    hashtag = h and h or ''
 
-  return utils.parse_json(response).access_token
+    prev.hashtag = hashtag
+    prev.show_name = show_name
+  else
+    hashtag = prev.hashtag
+  end
+
+  local ok, text = prompt(OS, hashtag)
+  if not ok then
+    message('canceled')
+    return
+  end
+
+  message(text)
 end
 
-local function get_hashtag(show_name, token)
-  
-end
 
-
+mp.add_key_binding('Alt+a', do_stuff)

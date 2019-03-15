@@ -1,15 +1,11 @@
+local trim = require('strings').trim
+
+
 local function system(cmd)
   local proc = io.popen(cmd)
   local body = proc:read('*all')
   local ok = proc:close()
   return ok, body
-end
-
-
-local function trim(str)
-  str = str:gsub('^%s+', '')
-  str = str:gsub('%s+$', '')
-  return str
 end
 
 
@@ -77,7 +73,7 @@ local function prompt(OS, default_msg)
   end
 
   if ok then
-    return trim(body)
+    return true, trim(body)
   end
 end
 
